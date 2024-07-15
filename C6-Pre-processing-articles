@@ -37,7 +37,7 @@ def pdf_extract(pdf_file):          #passing the pdf path to a function
     new_text = full_text[0]                             
 
     title = full_texts[0]
-    titles = re.split(r'Publication info|Die ZEIT (inklusive ZEIT Magazin)', title)
+    titles = re.split(r'Publication info|Die ZEIT (inklusive ZEIT Magazin)', title)  #adjust this info to outlet information in document - this will differ depending on source from which file was taken
     if len(titles) == 3:
         title = titles[0].strip()
     else:
