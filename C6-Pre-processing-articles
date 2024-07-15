@@ -1,0 +1,56 @@
+#THIS FILE CONTAINS AN EXAMPLE OF THE CODE USED TO SCRAPE RELEVANT INFORMATION FROM NEWSPAPER ARTCILES FOR THE SEMI-AUTOAMTED CONTENT ANALYSIS IN LEXIMANCER WHICH WAS PART OF PRE-PROCESSING
+
+#make sure files hare in PDF format 
+
+import pdfplumber
+from fpdf import FPDF                           # Import required module
+from os import listdir
+import re
+
+all_files = listdir()                                              #This get all files in the folder our script is
+
+all_pdf = [file for file in all_files if file.endswith('.pdf')]    #This append pdf items in the folder to a list name all pdf
+
+def pdf_extract(pdf_file):          #passing the pdf path to a function
+
+    """This function used to check for rule searching and take the arguement pdf_file"""
+    
+    new_pdf = FPDF(format='letter')
+
+    print(pdf_file)
+
+    pdf = pdfplumber.open(pdf_file)             #This module was used to open the pdf file
+    pages = pdf.pages
+    
+    text = ''
+
+    for i,pg in enumerate(pages):               #This loops through each page of the pdf, extracts its text and saves the text in the variable name text
+        
+        text += str(pages[i].extract_text())
+
+    needed_text = re.split(r'Load-Date', text)        #adjust 'Load-Date' to specific cutoff in document
+    needed_text = needed_text[0]
+    needed_text = needed_text[:-1] + ' Load-Date'     
+    full_texts = re.split(r'Body', needed_text)     #adjust 'Body' to specific cutoff in document; 
+    full_text = full_texts[-1].strip()              
+    full_text = re.split(r'Load-Date', full_text)   #adjust 'Load-Date' to cutoff point in document
+    new_text = full_text[0]                             
+
+    title = full_texts[0]
+    titles = re.split(r'Publication info|Die ZEIT (inklusive ZEIT Magazin)', title)
+    if len(titles) == 3:
+        title = titles[0].strip()
+    else:
+        title = titles[0].strip()
+        title = title.split('\n')
+        title = ''.join(title[0:2])
+    
+    #Each extracted file save to a .txt file 
+    save_file = open(f"re-writed/ZEIT/{pdf_file.strip('.pdf')}.txt", "w") 
+    save_file.write('\t\t' + title + '\n\n')
+    save_file.write(new_text)
+
+    save_file.close()
+
+for pdf in all_pdf:
+    pdf_extract(pdf)
